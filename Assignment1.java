@@ -501,7 +501,7 @@ class DLLDynamicSet implements DynamicSet {
     
     // worst-case O(n)
     public void insert(Comparable k) {
-        if (k == null) return;
+        if ((k == null) || (search(k) != null)) return; // no null values, no duplicates
         Node element = new Node(k);
         // base case: head is null, so insert it there
         if (head == null) {
@@ -517,11 +517,20 @@ class DLLDynamicSet implements DynamicSet {
             // last will only be null if the above loop never executes
             // which will only happen if head is greater than element
             // so in that case, insert it at head
-            if (last == null) { 
+            if (node != null) node.setPrev(element);
+            if (last == null) {
                 head = element;
-                node.setPrev(element);
                 head.setNext(node);
+                head.setPrev(null);
             } else {
+                //if (last.getKey().equals("Wilma Sanchez")) {
+                    //System.out.println("WOOOOOOPAWOOOOOOPAWOOOOOOPAWOOOOOOPAWOOOOOOPAWOOOOOOPA");
+                    //if (node != null) {
+                    //    System.out.println("node: "+ node.getKey());
+                    //}
+                    //System.out.println("element: "+ element.getKey());
+                    //if (last.getNext() != null) System.out.println("last.next: "+ last.getNext().getKey());
+                //}
                 last.setNext(element);
                 element.setNext(node);
                 element.setPrev(last);
@@ -535,7 +544,7 @@ class DLLDynamicSet implements DynamicSet {
             Node temp = element.getPrev();
             if (temp == null) {
                 head = element.getNext();
-                head.setPrev(null);
+                if (head != null) head.setPrev(null);
             } else {
                 temp.setNext(element.getNext());
                 if (element.getNext() != null) element.getNext().setPrev(temp);
@@ -551,6 +560,7 @@ class DLLDynamicSet implements DynamicSet {
     }
     
     public Node maximum() {
+        if (head == null) return null;
         Node node = head;
         while(node.hasNext() == true) {
             node = node.getNext();
@@ -720,7 +730,7 @@ class SkipList implements DynamicSet {
     public boolean delete(Comparable k) {
         SkipListNode p = search(k);
         
-        if (p != null) {
+        if ((p != null) && (p.getKey().equals(k))) {
             delete(p);
             
             return true;
@@ -738,6 +748,7 @@ class SkipList implements DynamicSet {
     }
     
     public SkipListNode successor(SetElement e) {
+        if (e == null) return null;
         SkipListNode node = (SkipListNode)e;
         while(node.getBelow() != null) {
             node = node.getBelow();
@@ -750,6 +761,7 @@ class SkipList implements DynamicSet {
     }
     
     public SkipListNode predecessor(SetElement e) {
+        if (e == null) return null;
         SkipListNode node = (SkipListNode)e;
         while(node.getBelow() != null) {
             node = node.getBelow();
@@ -771,7 +783,7 @@ class SkipList implements DynamicSet {
     }
     
     public SkipListNode maximum() {
-        if (this.lefttopmost == null) return null;
+        if (this.lefttopmost == null    ) return null;
         SkipListNode p = this.lefttopmost.getPositive();
         while (p.getBelow() != null) {
             p = p.getBelow(); // drop down
