@@ -61,7 +61,7 @@ public class Assignment1 {
                     runtest(bst, fileArray, i);
                     runtest(sk, fileArray, i);
                 } else if (choice_low.equals("insert")) {
-                    System.out.print("Enter input:");
+                    System.out.print("Enter input: ");
                     s = readCommand();
                     insert(ll, s);
                     insert(sk, s);
@@ -73,6 +73,7 @@ public class Assignment1 {
                     search(sk, s);
                     search(bst, s);
                 } else if (choice_low.equals("delete")) {
+                    System.out.print("Enter key to delete: ");
                     s = readCommand();
                     delete(ll, s);
                     delete(sk, s);
@@ -84,6 +85,7 @@ public class Assignment1 {
                     System.out.println("\n");
                     bst.print();
                 } else if (choice_low.equals("pred")) {
+                    System.out.print("Enter query: ");
                     s = readCommand();
                     pred(ll, s);
                     pred(sk, s);
@@ -91,6 +93,7 @@ public class Assignment1 {
                 } else if (choice_low.equals("levels")) {
                     System.out.print("Total levels in Skip List: "+sk.levels());
                 } else if (choice_low.equals("succ")) {
+                    System.out.print("Enter query: ");
                     s = readCommand();
                     succ(ll, s);
                     succ(sk, s);
@@ -521,6 +524,7 @@ class DLLDynamicSet implements DynamicSet {
             } else {
                 last.setNext(element);
                 element.setNext(node);
+                element.setPrev(last);
             }
         }
     }
@@ -529,13 +533,16 @@ class DLLDynamicSet implements DynamicSet {
         Node element = search(k);
         if (element != null) {
             Node temp = element.getPrev();
-            temp.setNext(element.getNext());
-            element.getNext().setPrev(temp);
-            //System.out.println("Successfully deleted key.");
+            if (temp == null) {
+                head = element.getNext();
+                head.setPrev(null);
+            } else {
+                temp.setNext(element.getNext());
+                if (element.getNext() != null) element.getNext().setPrev(temp);
+            }
             return true;
         } else {
             return false;
-            //System.out.println("Could not find any occurrence of key.");
         }
     }
     
@@ -621,16 +628,16 @@ class SkipList implements DynamicSet {
         SkipListNode p = this.lefttopmost;
         if (p == null) { 
             System.out.println("Empty.");
-        } else {/*
+        } else {
             while (p.getBelow() != null) {
                 p = p.getBelow(); // drop down
             }
             while (p != null) {
-                System.out.print(p.getKey() + ", ");
+                if (p.getKey() != null) System.out.print(p.getKey() + ", ");
                 p = p.getAfter();
             }
-            System.out.println("; Total "+size()+" items.");*/
-            // Super print
+            System.out.println("; Total "+size()+" items.");
+            /* Super print (prints a table of all levels, including infinity bound nodes)
             while (p != null) {
                 SkipListNode q = p;
                 while (q != null) {
@@ -639,7 +646,7 @@ class SkipList implements DynamicSet {
                 }
                 System.out.print("\n");
                 p = p.getBelow();
-            }
+            }*/
         }
     }
     
@@ -711,7 +718,23 @@ class SkipList implements DynamicSet {
     }
     
     public boolean delete(Comparable k) {
-        return false;
+        SkipListNode p = search(k);
+        
+        if (p != null) {
+            delete(p);
+            
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
+    public void delete(SkipListNode p) {
+        if (p.getAbove() != null) {
+            delete(p.getAbove());
+        }
+        p.getAfter().setBefore(p.getBefore());
+        p.getBefore().setAfter(p.getAfter());
     }
     
     public SkipListNode successor(SetElement e) {
@@ -739,7 +762,7 @@ class SkipList implements DynamicSet {
     }
     
     public SkipListNode minimum() {
-        if ((this.lefttopmost == null) || (this.lefttopmost.getAfter().getKey() == null)) return null;
+        if (this.lefttopmost == null) return null;
         SkipListNode p = this.lefttopmost;
         while (p.getBelow() != null) {
             p = p.getBelow(); // drop down
@@ -748,7 +771,7 @@ class SkipList implements DynamicSet {
     }
     
     public SkipListNode maximum() {
-        if ((this.lefttopmost == null) || (this.lefttopmost.getAfter().getKey() == null)) return null;
+        if (this.lefttopmost == null) return null;
         SkipListNode p = this.lefttopmost.getPositive();
         while (p.getBelow() != null) {
             p = p.getBelow(); // drop down
