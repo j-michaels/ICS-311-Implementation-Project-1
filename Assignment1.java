@@ -13,7 +13,7 @@ public class Assignment1 {
     public static void main(String[] args) {
         String fileName = "";
         if (args.length < 1) {
-            System.out.println("Usage: java Implement1JSM filename");
+            System.out.println("Usage: java Assignment1 filename");
             System.out.println("Where filename is the data file to be read.");
             System.exit(1);
         } else {
@@ -32,14 +32,15 @@ public class Assignment1 {
             String nextLine;
             int i = 0;
             while ((nextLine = br.readLine()) != null) {
-                fileArray[i] = nextLine;
+                fileArray[i] = nextLine.trim();
                 i++;
                 //System.out.println(nextLine);
             }
             
             boolean in_menu = true;
+            printMenu();
             while (in_menu) {
-                printMenu();
+                System.out.print("> ");
                 BufferedReader inRdr = new BufferedReader(new InputStreamReader(System.in));
                 String choice = null;
                 try {
@@ -58,17 +59,19 @@ public class Assignment1 {
                     runtest(ll, fileArray, i);
                     runtest(bst, fileArray, i);
                 } else if (choice_low.equals("insert")) {
+                    System.out.print("Enter input:");
                     s = readCommand();
                     insert(ll, s);
+                    insert(bst, s);
                 } else if (choice_low.equals("search")) {
+                    System.out.print("Enter query: ");
                     s = readCommand();
-                    //System.out.println(ll.search(s).getKey());
                     search(ll, s);
                     search(bst, s);
                 } else if (choice_low.equals("delete")) {
                     s = readCommand();
-                    //delete(ll, s);
-                    
+                    delete(ll, s);
+                    //delete(bst, s);
                 } else if (choice_low.equals("print")) {
                     
                     ll.print();
@@ -79,7 +82,9 @@ public class Assignment1 {
                 } else if (choice_low.equals("min")) {
     
                 } else if (choice_low.equals("max")) {
-
+                    
+                } else if (choice_low.equals("menu") || choice_low.equals("help")) {
+                    printMenu();
                 } else if (choice_low.equals("exit")) {
                     in_menu = false;
                     break;
@@ -107,7 +112,7 @@ public class Assignment1 {
         return s;
     }
     
-    // Runs several di`fferent tests on an implementation of Dynamic Set
+    // Runs several different tests on an implementation of Dynamic Set
     public static void runtest(DynamicSet ll, String[] arr, int arrlength) {
         if (arr.length < 1) {return;} // nothing to do if there's nothing in the array
         //System.out.println("Beginning runtest.");
@@ -178,7 +183,8 @@ public class Assignment1 {
         long totalLLPredTime = 0; // for average
                 
         firstRun = true;
-        for (int i=0; i<j; i++) { // j is the length of elements array (above)
+        //System.out.println("j = " + j);
+        for (int i=0; i<j; i++) { // j is the length of elements array - 1 (above)
             
             long startTime = System.nanoTime();
             ll.predecessor(elements[i]);
@@ -237,13 +243,13 @@ public class Assignment1 {
         SetElement min = ll.minimum();
         long minLLTime = System.nanoTime() - startTime;
         
-        System.out.println("Min: "+min.getKey());
+        //System.out.println("Min: "+min.getKey());
         
         //System.out.println("Running max");
         startTime = System.nanoTime();
         SetElement max = ll.maximum();
         long maxLLTime = System.nanoTime() - startTime;
-        System.out.println("Max: "+max.getKey());
+        //System.out.println("Max: "+max.getKey());
         
         System.out.println("Size: " + arrlength);
         /*
@@ -251,15 +257,16 @@ public class Assignment1 {
         System.out.println("            | LL       |  SK      |  BST     | RBT      |");
         System.out.println("---------------------------------------------------------");
         */
-        System.out.println("-------------------------------------");
+        System.out.println("-----------------------------------------");
         System.out.println("            | "+ll.kind());
-        System.out.println("-------------------------------------");
+        System.out.println("-----------------------------------------");
         System.out.println("insert      | " + minLLInsertTime + " / " + (totalLLInsertTime/arrlength) + " / " + maxLLInsertTime);
         System.out.println("search      | " + minLLSearchTime + " / " + (totalLLSearchTime/arrlength) + " / " + maxLLSearchTime);
         System.out.println("predecessor | " + minLLPredTime + " / " + (totalLLPredTime/arrlength) + " / " + maxLLPredTime);
         System.out.println("predecessor | " + minLLSuccTime + " / " + (totalLLSuccTime/arrlength) + " / " + maxLLSuccTime);
         System.out.println("minimum     | " + minLLTime);
         System.out.println("minimum     | " + maxLLTime);
+        System.out.println("-----------------------------------------\n");
 
         
         
@@ -270,8 +277,7 @@ public class Assignment1 {
         SetElement element = set.search(key);
         long time = System.nanoTime() - startTime;
         if (element==null) {
-            System.out.println("Query not found in "+ set.kind() + ".");
-            
+            System.out.println("Query not found in " +set.size()+ " items of "+ set.kind() + ".");
         } else {
             System.out.println("Query result in "+set.kind()+": "+element.getKey());
         }
@@ -285,11 +291,32 @@ public class Assignment1 {
         return System.nanoTime() - startTime;
     }
     
+    public static long delete(DynamicSet set, String key) {
+        long startTime = System.nanoTime();
+        boolean result = set.delete(key);
+        long resultTime = System.nanoTime() - startTime;
+        if (result == true) {
+            System.out.println("Successfully deleted key from " + set.kind()+".");
+        } else {
+            System.out.println("Could not find any occurrence of key in "+set.kind()+".");
+        }
+        return resultTime;
+    }
     
     public static void printMenu() {
-        System.out.println("Options:");
+        System.out.println("\n--------------------------------------------");
+        System.out.println("|   * Menu *                               |");
+        System.out.println("| type any of these commands and hit enter |");
+        System.out.println("| if there are any parameters needed, you  |");
+        System.out.println("| will be prompted                         |");
+//        System.out.println("--------------------------------------------");
         System.out.println("runtest - Insert data from the file into each of the Dynamic Set implementations.");
-        
+        System.out.println("insert - Insert a key into all of the Dynamic Sets.");
+        System.out.println("search - Search for a given key in all of the Dynamic Sets.");
+        System.out.println("delete a given key from all of the Dynamic Sets.");
+        System.out.println("pred, succ - find the predecessor or successor of a given key from all of the Dynamic Sets");
+        System.out.println("min, max - find the min or max from all of the Dynamic Sets.");
+        System.out.println("help, menu - print this menu");
     }
     
 }
@@ -299,7 +326,7 @@ interface DynamicSet {
     public int size();
     public void insert(Comparable k);
     public String kind();
-    //public void delete(SetElement e);
+    public boolean delete(Comparable k);
     public SetElement search(Comparable k);
     public SetElement minimum();
     public SetElement maximum();
@@ -375,7 +402,8 @@ class DLLDynamicSet implements DynamicSet {
         } else {
             Node searcher = this.head;
             while ((searcher != null)) {
-                if (searcher.getKey().equals(key) == true) { return searcher; } 
+                //System.out.println("Comparing current node '"+searcher.getKey()+"' to query '" + key+"'");
+                if (searcher.getKey().equals(key) == true) { return searcher; }
                 searcher = searcher.getNext();
             }
             return null;
@@ -411,15 +439,17 @@ class DLLDynamicSet implements DynamicSet {
         }
     }
     
-    public void delete(Comparable k) {
+    public boolean delete(Comparable k) {
         Node element = search(k);
         if (element != null) {
             Node temp = element.getPrev();
             temp.setNext(element.getNext());
             element.getNext().setPrev(temp);
-            System.out.println("Successfully deleted key.");
+            //System.out.println("Successfully deleted key.");
+            return true;
         } else {
-            System.out.println("Could not find any occurrence of key.");
+            return false;
+            //System.out.println("Could not find any occurrence of key.");
         }
     }
     
@@ -580,23 +610,30 @@ class BSTDynamicSet implements DynamicSet {
         if (v!=null) v.setParent(u.getParent());
     }
     
-    public void delete(SetElement e) {
-        BinaryNode bn = (BinaryNode)e;
-        if (bn.getLeft() == null) {
-            transplant(bn, bn.getRight());
-        } else if (bn.getRight() == null) {
-            transplant(bn, bn.getLeft());
+    public boolean delete(Comparable k) {
+        BinaryNode bn = search(k);
+        if (bn == null) {
+            //System.out.println("")
+            return false;
         } else {
-            BinaryNode y = bn.getRight().minimum();
-            if (y.getParent() != bn) {
-                transplant(y, y.getRight());
-                y.setRight(bn.getRight());
-                y.getRight().setParent(y);
-            }
-            transplant(bn, y);
-            y.setLeft(bn.getLeft());
-            y.getLeft().setParent(y);
+            //BinaryNode bn = (BinaryNode)e;
+            if (bn.getLeft() == null) {
+                transplant(bn, bn.getRight());
+            } else if (bn.getRight() == null) {
+                transplant(bn, bn.getLeft());
+            } else {
+                BinaryNode y = bn.getRight().minimum();
+                if (y.getParent() != bn) {
+                    transplant(y, y.getRight());
+                    y.setRight(bn.getRight());
+                    y.getRight().setParent(y);
+                }
+                transplant(bn, y);
+                y.setLeft(bn.getLeft());
+                y.getLeft().setParent(y);
             
+            }
+            return true;
         }
     }
     
