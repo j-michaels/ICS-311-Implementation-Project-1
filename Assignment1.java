@@ -23,7 +23,7 @@ public class Assignment1 {
         try {
 
             DLLDynamicSet ll = new DLLDynamicSet();
-            DLLDynamicSet sk = new DLLDynamicSet();
+            SkipList sk = new SkipList();
             BSTDynamicSet bst = new BSTDynamicSet();
             DLLDynamicSet rbt = new DLLDynamicSet();
             String[] fileArray = new String[100000];
@@ -55,35 +55,54 @@ public class Assignment1 {
                 if (choice_low.equals("runtest")) {
                     //System.out.println("Running test");
                     ll = new DLLDynamicSet();
+                    sk = new SkipList();
                     bst = new BSTDynamicSet();
                     runtest(ll, fileArray, i);
                     runtest(bst, fileArray, i);
+                    runtest(sk, fileArray, i);
                 } else if (choice_low.equals("insert")) {
                     System.out.print("Enter input:");
                     s = readCommand();
                     insert(ll, s);
+                    insert(sk, s);
                     insert(bst, s);
                 } else if (choice_low.equals("search")) {
                     System.out.print("Enter query: ");
                     s = readCommand();
                     search(ll, s);
+                    search(sk, s);
                     search(bst, s);
                 } else if (choice_low.equals("delete")) {
                     s = readCommand();
                     delete(ll, s);
+                    delete(sk, s);
                     delete(bst, s);
                 } else if (choice_low.equals("print")) {
                     ll.print();
                     System.out.println("\n");
+                    sk.print();
+                    System.out.println("\n");
                     bst.print();
                 } else if (choice_low.equals("pred")) {
-    
+                    s = readCommand();
+                    pred(ll, s);
+                    pred(sk, s);
+                    pred(bst, s);
+                } else if (choice_low.equals("levels")) {
+                    System.out.print("Total levels in Skip List: "+sk.levels());
                 } else if (choice_low.equals("succ")) {
-    
+                    s = readCommand();
+                    succ(ll, s);
+                    succ(sk, s);
+                    succ(bst, s);
                 } else if (choice_low.equals("min")) {
-    
+                    min(ll);
+                    min(sk);
+                    min(bst);
                 } else if (choice_low.equals("max")) {
-                    
+                    max(ll);
+                    max(sk);
+                    max(bst);
                 } else if (choice_low.equals("menu") || choice_low.equals("help")) {
                     printMenu();
                 } else if (choice_low.equals("exit")) {
@@ -304,6 +323,67 @@ public class Assignment1 {
         return resultTime;
     }
     
+    // note: only returns the time for accessing the predecessor, not
+    // for the search function
+    public static long pred(DynamicSet set, String key) {
+        SetElement e = set.search(key);
+        long startTime = System.nanoTime();
+        SetElement result = set.predecessor(e);
+        long resultTime = System.nanoTime() - startTime;
+        
+        if ((result == null) || (e.getKey().equals(key) != true)) {
+            System.out.println(set.kind() + ": No predecessor.");
+        } else {
+            System.out.println("Predecessor in "+set.kind()+": "+result.getKey());
+        }
+        
+        return resultTime;
+    }
+
+    public static long succ(DynamicSet set, String key) {
+        SetElement e = set.search(key);
+        
+        long startTime = System.nanoTime();
+        SetElement result = set.successor(e);
+        long resultTime = System.nanoTime() - startTime;
+        
+        if ((result == null) || (e.getKey().equals(key) != true)) {
+            System.out.println(set.kind() + ": No successor.");
+        } else {
+            System.out.println("Successor in "+set.kind()+": "+result.getKey());
+        }
+        
+        return resultTime;
+    }
+    
+    public static long min(DynamicSet set) {
+        long startTime = System.nanoTime();
+        SetElement result = set.minimum();
+        long resultTime = System.nanoTime() - startTime;
+        
+        if (result == null) {
+            System.out.println(set.kind()+": Empty set, no minimum.");
+        } else {
+            System.out.println("Minimum in "+set.kind()+": "+result.getKey());
+        }
+        
+        return resultTime;
+    }
+    
+    public static long max(DynamicSet set) {
+        long startTime = System.nanoTime();
+        SetElement result = set.maximum();
+        long resultTime = System.nanoTime() - startTime;
+        
+        if (result == null) {
+            System.out.println(set.kind()+": Empty set, no maximum.");
+        } else {
+            System.out.println("Maximum in "+set.kind()+": "+result.getKey());
+        }
+        
+        return resultTime;
+    }
+
     public static void printMenu() {
         System.out.println("\n--------------------------------------------");
         System.out.println("|   * Menu *                               |");
@@ -472,10 +552,12 @@ class DLLDynamicSet implements DynamicSet {
     }
     
     public Node successor(SetElement e) {
+        if (e == null) return null;
         return ((Node)e).getNext();
     }
     
     public Node predecessor(SetElement e) {
+        if (e == null) return null;
         return ((Node)e).getPrev();
     }
     //private 
@@ -517,10 +599,48 @@ class SkipList implements DynamicSet {
             p = p.getBelow(); // drop down
         }
         while (p.getAfter() != null) {
-            i++;
+            if (p.getKey() != null) i++;
             p = p.getAfter();
         }
         return i;
+    }
+    
+    public int levels() {
+        SkipListNode p = this.lefttopmost;
+        if (p == null) return 0;
+        int i = 1;
+        while (p.getBelow() != null) {
+            i++;
+            p = p.getBelow(); // drop down
+        }
+        return i;
+    }
+    
+    public void print() {
+        System.out.print(kind() + ": ");
+        SkipListNode p = this.lefttopmost;
+        if (p == null) { 
+            System.out.println("Empty.");
+        } else {/*
+            while (p.getBelow() != null) {
+                p = p.getBelow(); // drop down
+            }
+            while (p != null) {
+                System.out.print(p.getKey() + ", ");
+                p = p.getAfter();
+            }
+            System.out.println("; Total "+size()+" items.");*/
+            // Super print
+            while (p != null) {
+                SkipListNode q = p;
+                while (q != null) {
+                    q.simpleprint();
+                    q = q.getAfter();
+                }
+                System.out.print("\n");
+                p = p.getBelow();
+            }
+        }
     }
     
     public SkipListNode search(Comparable k) {
@@ -529,22 +649,37 @@ class SkipList implements DynamicSet {
         while (p.getBelow() != null) {
             p = p.getBelow(); // drop down
             // p is not null
-            while ((p.getAfter() != null) && (p.getAfter().getKey().compareTo(k) <= 0)) {
+            while ((p.getAfter() != null) && (p.getAfter().getKey() != null) && (p.getAfter().getKey().compareTo(k) <= 0)) {
                 p = p.getAfter(); // scan forward
             }
         }
         return p;
     }
     
+    public SkipListNode makeNewLevel() {
+        SkipListNode negativeInf = new SkipListNode(null);
+        negativeInf.setInfinity(-1);
+        SkipListNode positiveInf = new SkipListNode(null);
+        positiveInf.setInfinity(1);
+        negativeInf.setPositive(positiveInf);
+        positiveInf.setBefore(negativeInf);
+        return negativeInf;
+    }
+    
     public void insert(Comparable k) {
+        //System.out.println("Inserting "+k+" into skip list");
         if (lefttopmost == null) {
-            lefttopmost = new SkipListNode(k);
-        } else {            
-            //SkipListNode node = new SkipListNode(k);
+            //System.out.println("head is null, putting there.");
+            lefttopmost = makeNewLevel();//new SkipListNode(k);
+            insertAfterAbove(lefttopmost, null, k);
+        } else {
+            //System.out.println("Head is not null, finding where to put it");
             SkipListNode p = search(k);
             SkipListNode q = insertAfterAbove(p, null, k);
             Random random = new Random(System.nanoTime());
-            while (random.nextInt(2) < 0.5) {
+            while (random.nextInt(2) == 0) {
+                // create a new level
+                // while the previous node's above is empty, scan backwards to find it
                 while (p.getAbove() == null) {
                     p = p.getBefore();
                 }
@@ -553,15 +688,25 @@ class SkipList implements DynamicSet {
             }
         }
     }
-    
+    //insert after and above
     public SkipListNode insertAfterAbove(SkipListNode before, SkipListNode below, Comparable k) {
         SkipListNode node = new SkipListNode(k);
         node.setAfter(before.getAfter());
         node.setBefore(before);
         before.setAfter(node);
-        node.getAfter().setBefore(node);
+        if (node.getAfter() != null) node.getAfter().setBefore(node);
         node.setBelow(below);
         if (below != null) below.setAbove(node);
+        
+        // maintain top row as (-inf, +inf)
+        if (node.leftMost().getAbove() == null) {
+            SkipListNode negativeInf = makeNewLevel();
+            lefttopmost.setAbove(negativeInf);
+            negativeInf.setBelow(lefttopmost);
+            negativeInf.getAfter().setBelow(lefttopmost.getPositive());
+            lefttopmost.getPositive().setAbove(negativeInf.getAfter());
+            lefttopmost = negativeInf;
+        }
         return node;
     }
     
@@ -570,37 +715,94 @@ class SkipList implements DynamicSet {
     }
     
     public SkipListNode successor(SetElement e) {
-        return lefttopmost;
+        SkipListNode node = (SkipListNode)e;
+        while(node.getBelow() != null) {
+            node = node.getBelow();
+        }
+        if ((node.getAfter() == null) || (node.getAfter().getKey() == null)) {
+            return null;
+        } else {
+            return node.getAfter();
+        }
     }
     
     public SkipListNode predecessor(SetElement e) {
-        return lefttopmost;
+        SkipListNode node = (SkipListNode)e;
+        while(node.getBelow() != null) {
+            node = node.getBelow();
+        }
+        if ((node.getBefore() == null) || (node.getBefore().getKey() == null)) {
+            return null;
+        } else {
+            return node.getBefore();
+        }
     }
     
     public SkipListNode minimum() {
-        return lefttopmost;
+        if ((this.lefttopmost == null) || (this.lefttopmost.getAfter().getKey() == null)) return null;
+        SkipListNode p = this.lefttopmost;
+        while (p.getBelow() != null) {
+            p = p.getBelow(); // drop down
+        }
+        return p.getAfter();
     }
     
     public SkipListNode maximum() {
-        return lefttopmost;
+        if ((this.lefttopmost == null) || (this.lefttopmost.getAfter().getKey() == null)) return null;
+        SkipListNode p = this.lefttopmost.getPositive();
+        while (p.getBelow() != null) {
+            p = p.getBelow(); // drop down
+        }
+        return p.getBefore();
     }
 }
 
 class SkipListNode extends SetElement {
-    SkipListNode before, after, above, below;
+    SkipListNode before, after, above, below, positive;
+    int infinity;
     
-    public SkipListNode(Comparable k) { super(k, null); }
+    public SkipListNode(Comparable k) { super(k, null); infinity = 0; positive = null; }
+    
+    public void simpleprint() {
+        if (getKey() == null) {
+            if (infinity < 0) {
+                System.out.print("-inf");
+            } else {
+                System.out.print("+inf");
+            }
+        } else {
+            System.out.print(" "+getKey()+" ");
+        }
+    }
+    
+    public SkipListNode leftMost() {
+        SkipListNode node = this;
+        while (node.getBefore() != null) {
+            node = node.getBefore();
+        }
+        return node;
+    }
     
     public void setBefore(SkipListNode e) { this.before = e; }
     public void setAfter(SkipListNode e) { this.after = e; }
     public void setBelow(SkipListNode e) { this.below = e; }
     public void setAbove(SkipListNode e) { this.above = e; }
+    public void setInfinity(int i) { this.infinity = i; }
+    public void setPositive(SkipListNode e) { setAfter(e); this.positive = e; }
     
     public SkipListNode getBefore() { return this.before; }
     public SkipListNode getAfter() { return this.after; }
     public SkipListNode getBelow() { return this.below; }
     public SkipListNode getAbove() { return this.above; }
+    public SkipListNode getPositive() { return this.positive; }
     
+    public int compareTo(SkipListNode otherNode) {
+        if ((this.getKey() != null) && (otherNode.getKey() != null)) {
+            return this.getKey().compareTo(otherNode.getKey());
+        } else {
+            return infinity;
+        }
+    }
 }
 
 // Binary Search Tree
@@ -711,16 +913,21 @@ class BSTDynamicSet implements DynamicSet {
     }
     
     public BinaryNode minimum() {
+        if (head == null) return null;
         return head.minimum();
     }
     
     public BinaryNode maximum() {
+        if (head == null) return null;
         return head.maximum();
     }
     
     // In a binary search tree, the successor of any element is the minimum value in its
     // right-hand-side child tree
     public BinaryNode successor(SetElement e) {
+        if (e == null){
+            return null;
+        }
         BinaryNode be = (BinaryNode)e;
         if (be.getRight() == null) { // if right is null, there might be a successor above
             BinaryNode y = be.getParent();
@@ -736,6 +943,7 @@ class BSTDynamicSet implements DynamicSet {
     
     // Predecessor is found the opposite way: left-hand-side, and maximum
     public BinaryNode predecessor(SetElement e) {
+        if (e == null) return null;
         BinaryNode be = (BinaryNode)e;
         if (be.getLeft() == null) { // if left is null, there might be a successor above
             BinaryNode y = be.getParent();
