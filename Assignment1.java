@@ -74,7 +74,7 @@ public class Assignment1 {
                     delete(bst, s);
                 } else if (choice_low.equals("print")) {
                     ll.print();
-                    System.out.println("\n")
+                    System.out.println("\n");
                     bst.print();
                 } else if (choice_low.equals("pred")) {
     
@@ -354,7 +354,6 @@ abstract class SetElement {
     return data; 
   }
   public int compareTo(SetElement otherElement) {
-      //System.out.println("Comparing!!: "+otherElement.getKey());
       return this.getKey().compareTo(otherElement.getKey());
   }
 }
@@ -498,71 +497,114 @@ class Node extends SetElement {
 
 
 // Skip List
-/*
-public class SkipList<T> {
+
+class SkipList implements DynamicSet {
+    SkipListNode lefttopmost;
     
-    public SkipListNode<T> search(T k) {
-        SkipListNode<T> p = this.lefttopmost;
-        
-        while (p.below != null) {
-            p = p.getBelow();
-            while (key p.after < k) {
-                p = p.after;
+    public SkipList() {
+        this.lefttopmost = null;
+    }
+    
+    public String kind() {
+        return "Skip List";
+    }
+    
+    public int size() {
+        SkipListNode p = this.lefttopmost;
+        if (p == null) return 0;
+        int i = 0;
+        while (p.getBelow() != null) {
+            p = p.getBelow(); // drop down
+        }
+        while (p.getAfter() != null) {
+            i++;
+            p = p.getAfter();
+        }
+        return i;
+    }
+    
+    public SkipListNode search(Comparable k) {
+        SkipListNode p = this.lefttopmost;
+        if (p == null) return null;
+        while (p.getBelow() != null) {
+            p = p.getBelow(); // drop down
+            // p is not null
+            while ((p.getAfter() != null) && (p.getAfter().getKey().compareTo(k) <= 0)) {
+                p = p.getAfter(); // scan forward
             }
         }
         return p;
     }
     
-    public void insert(T data) {
-        SkipListNode<T> node = new SkipListNode(data);
-        SkipListNode<T> p = search(k);
-        SkipListNode<T> q = insertAfterAbove(p, null, node);
-        while (random(1) < 0.5) {
-            while (p.above() == null) {
-                p = p.getBefore();
+    public void insert(Comparable k) {
+        if (lefttopmost == null) {
+            lefttopmost = new SkipListNode(k);
+        } else {            
+            //SkipListNode node = new SkipListNode(k);
+            SkipListNode p = search(k);
+            SkipListNode q = insertAfterAbove(p, null, k);
+            Random random = new Random(System.nanoTime());
+            while (random.nextInt(2) < 0.5) {
+                while (p.getAbove() == null) {
+                    p = p.getBefore();
+                }
+                p = p.getAbove();
+                q = insertAfterAbove(p, q, k);
             }
-            p = p.getAbove();
-            q = insertAfterAbove(p, q, node);
         }
     }
     
-    public void delete(T data) {
-        
+    public SkipListNode insertAfterAbove(SkipListNode before, SkipListNode below, Comparable k) {
+        SkipListNode node = new SkipListNode(k);
+        node.setAfter(before.getAfter());
+        node.setBefore(before);
+        before.setAfter(node);
+        node.getAfter().setBefore(node);
+        node.setBelow(below);
+        if (below != null) below.setAbove(node);
+        return node;
     }
     
-    public T successor() {
-        
+    public boolean delete(Comparable k) {
+        return false;
     }
     
-    public T predecessor() {
-        
+    public SkipListNode successor(SetElement e) {
+        return lefttopmost;
     }
     
-    public T minumum() {
-        
+    public SkipListNode predecessor(SetElement e) {
+        return lefttopmost;
     }
     
-    public T maximum() {
-        
+    public SkipListNode minimum() {
+        return lefttopmost;
+    }
+    
+    public SkipListNode maximum() {
+        return lefttopmost;
     }
 }
 
-public class SkipListNode<T> {
-    SkipListNode<T> before, after, above, below;
+class SkipListNode extends SetElement {
+    SkipListNode before, after, above, below;
     
-    public void setBefore(SkipListNode<T> e) { this.before = e; }
-    public void setAfter(SkipListNode<T> e) { this.after = e; }
-    public void setBelow(SkipListNode<T> e) { this.below = e; }
-    public void setAbove(SkipListNode<T> e) { this.above = e; }
+    public SkipListNode(Comparable k) { super(k, null); }
     
-    public SkipListNode<T> getBefore() { return this.before; }
-    public SkipListNode<T> getAfter() { return this.after; }
-    public SkipListNode<T> getBelow() { return this.below; }
-    public SkipListNode<T> getAbove() { return this.above; }
+    public void setBefore(SkipListNode e) { this.before = e; }
+    public void setAfter(SkipListNode e) { this.after = e; }
+    public void setBelow(SkipListNode e) { this.below = e; }
+    public void setAbove(SkipListNode e) { this.above = e; }
+    
+    public SkipListNode getBefore() { return this.before; }
+    public SkipListNode getAfter() { return this.after; }
+    public SkipListNode getBelow() { return this.below; }
+    public SkipListNode getAbove() { return this.above; }
+    
 }
 
 // Binary Search Tree
-*/
+
 class BSTDynamicSet implements DynamicSet {
     BinaryNode head;
     
