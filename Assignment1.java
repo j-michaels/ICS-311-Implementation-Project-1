@@ -71,10 +71,11 @@ public class Assignment1 {
                 } else if (choice_low.equals("delete")) {
                     s = readCommand();
                     delete(ll, s);
-                    //delete(bst, s);
+                    delete(bst, s);
                 } else if (choice_low.equals("print")) {
-                    
                     ll.print();
+                    System.out.println("\n")
+                    bst.print();
                 } else if (choice_low.equals("pred")) {
     
                 } else if (choice_low.equals("succ")) {
@@ -310,13 +311,14 @@ public class Assignment1 {
         System.out.println("| if there are any parameters needed, you  |");
         System.out.println("| will be prompted                         |");
 //        System.out.println("--------------------------------------------");
-        System.out.println("runtest - Insert data from the file into each of the Dynamic Set implementations.");
+        System.out.println("runtest - Insert data from the file into each of the Dynamic Set implementations. Replaces the current data.");
         System.out.println("insert - Insert a key into all of the Dynamic Sets.");
         System.out.println("search - Search for a given key in all of the Dynamic Sets.");
-        System.out.println("delete a given key from all of the Dynamic Sets.");
-        System.out.println("pred, succ - find the predecessor or successor of a given key from all of the Dynamic Sets");
-        System.out.println("min, max - find the min or max from all of the Dynamic Sets.");
-        System.out.println("help, menu - print this menu");
+        System.out.println("delete - Delete a given key from all of the Dynamic Sets.");
+        System.out.println("pred, succ - Find the predecessor or successor of a given key from all of the Dynamic Sets");
+        System.out.println("min, max - Find the min or max from all of the Dynamic Sets.");
+        System.out.println("print - Prints out all Dynamic Sets in order.");
+        System.out.println("help, menu - Print this menu.");
     }
     
 }
@@ -385,12 +387,17 @@ class DLLDynamicSet implements DynamicSet {
     
     // prints in order
     public void print() {
-        Node node = head;
-        while (node != null) {
-            System.out.print(node.getKey() + ", ");
-            node = node.getNext();
+        System.out.print(kind() + ": ");
+        if (head == null) {
+            System.out.println("Empty.");
+        } else {
+            Node node = head;
+            while (node != null) {
+                System.out.print(node.getKey() + ", ");
+                node = node.getNext();
+            }
+            System.out.println("; Total " + size() + " items.");
         }
-        System.out.println(" Fin$");
     }
     
     // should take O(n) time
@@ -571,12 +578,21 @@ class BSTDynamicSet implements DynamicSet {
         }
     }
     
+    public void print() {
+        System.out.print(kind() + ": ");
+        if (head == null) {
+            System.out.println("Empty.");
+        } else {
+            head.print();
+            System.out.println("; Total "+size()+" items.");
+        }
+    }
+    
     public BSTDynamicSet() {
         head = null;
     }
     
     public void insert(Comparable k) {
-        //BinaryNode bn = search(k);
         BinaryNode y = null;
         BinaryNode x = head;
         while (x != null) {
@@ -722,7 +738,11 @@ class BinaryNode extends SetElement {
         }
     }
     
-
+    public void print() {
+        if (left != null) { left.print(); }
+        System.out.print(this.getKey() + ", ");
+        if (right != null) { right.print(); }
+    }
     
     public int count() {
         int rhs = 0;
