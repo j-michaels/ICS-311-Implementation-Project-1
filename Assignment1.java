@@ -52,7 +52,7 @@ public class Assignment1 {
                 String choice_low = choice.toLowerCase();
                 String s;
                 if (choice_low.equals("runtest")) {
-                    System.out.println("Running test");
+                    //System.out.println("Running test");
                     ll = new DLLDynamicSet();
                     bst = new BSTDynamicSet();
                     runtest(ll, fileArray, i);
@@ -62,10 +62,12 @@ public class Assignment1 {
                     insert(ll, s);
                 } else if (choice_low.equals("search")) {
                     s = readCommand();
-                    System.out.println(ll.search(s).getKey());
-//                    search(dll, s);
+                    //System.out.println(ll.search(s).getKey());
+                    search(ll, s);
+                    search(bst, s);
                 } else if (choice_low.equals("delete")) {
                     s = readCommand();
+                    //delete(ll, s);
                     
                 } else if (choice_low.equals("print")) {
                     
@@ -105,8 +107,8 @@ public class Assignment1 {
         return s;
     }
     
-    // Runs several different tests on an implementation of Dynamic Set
-    public static void runtest(DynamicSet ll, String kind, String[] arr, int arrlength) {
+    // Runs several di`fferent tests on an implementation of Dynamic Set
+    public static void runtest(DynamicSet ll, String[] arr, int arrlength) {
         if (arr.length < 1) {return;} // nothing to do if there's nothing in the array
         //System.out.println("Beginning runtest.");
         //System.out.println("Inserting all values into Dynamic Set from the array.");
@@ -264,10 +266,16 @@ public class Assignment1 {
     }
 
     public static long search(DynamicSet set, String key) {
+        long startTime = System.nanoTime();
         SetElement element = set.search(key);
+        long time = System.nanoTime() - startTime;
         if (element==null) {
-            System.out.println("Query not found.");
+            System.out.println("Query not found in "+ set.kind() + ".");
+            
+        } else {
+            System.out.println("Query result in "+set.kind()+": "+element.getKey());
         }
+        return time;
     }
     
     public static long insert(DynamicSet set, String key) {
@@ -361,7 +369,8 @@ class DLLDynamicSet implements DynamicSet {
     // should take O(n) time
     public Node search(Comparable key) {
         //base case: head is the result
-        if (head.getKey().equals(key)) {
+        
+        if ((head == null) || (head.getKey().equals(key))) {
             return head;
         } else {
             Node searcher = this.head;
