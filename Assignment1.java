@@ -25,7 +25,7 @@ public class Assignment1 {
             DLLDynamicSet ll = new DLLDynamicSet();
             SkipList sk = new SkipList();
             BSTDynamicSet bst = new BSTDynamicSet();
-            DLLDynamicSet rbt = new DLLDynamicSet();
+            //DLLDynamicSet rbt = new DLLDynamicSet();
             String[] fileArray = new String[100000];
             FileReader reader = new FileReader(fileName);
             BufferedReader br = new BufferedReader(reader);
@@ -284,11 +284,11 @@ public class Assignment1 {
         System.out.println("            | "+ll.kind());
         System.out.println("-----------------------------------------");
         System.out.println("insert      | " + minLLInsertTime + " / " + (totalLLInsertTime/arrlength) + " / " + maxLLInsertTime);
-        System.out.println("search      | " + minLLSearchTime + " / " + (totalLLSearchTime/arrlength) + " / " + maxLLSearchTime);
-        System.out.println("predecessor | " + minLLPredTime + " / " + (totalLLPredTime/arrlength) + " / " + maxLLPredTime);
-        System.out.println("predecessor | " + minLLSuccTime + " / " + (totalLLSuccTime/arrlength) + " / " + maxLLSuccTime);
+        System.out.println("search      | " + minLLSearchTime + " / " + (totalLLSearchTime/10) + " / " + maxLLSearchTime);
+        System.out.println("predecessor | " + minLLPredTime + " / " + (totalLLPredTime/j) + " / " + maxLLPredTime);
+        System.out.println("successor   | " + minLLSuccTime + " / " + (totalLLSuccTime/j) + " / " + maxLLSuccTime);
         System.out.println("minimum     | " + minLLTime);
-        System.out.println("minimum     | " + maxLLTime);
+        System.out.println("maximum     | " + maxLLTime);
         System.out.println("-----------------------------------------\n");
 
         
